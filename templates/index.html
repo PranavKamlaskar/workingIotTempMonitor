@@ -1,16 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>IoT Dashboard</title>
+  <meta charset="UTF-8">
+  <title>ESP8266 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    .reading {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    #historyChart {
+      max-width: 800px;
+      margin-top: 40px;
+    }
   </style>
 </head>
 <body>
   <h1>Temperature & Humidity</h1>
-  <p><strong>Temperature:</strong> <span id="temp">--</span> °C</p>
-  <p><strong>Humidity:</strong> <span id="hum">--</span> %</p>
-  <p><strong>Time:</strong> <span id="time">--</span></p>
+  <div class="reading">Temperature: <span id="temp">--</span> °C</div>
+  <div class="reading">Humidity: <span id="hum">--</span> %</div>
+  <div class="reading">Time: <span id="timestamp">--</span></div>
+
+  <h3>Temperature & Humidity History (Past 50)</h3>
+  <canvas id="historyChart" width="400" height="200"></canvas>
 
   <script>
     async function updateData() {
@@ -18,10 +37,51 @@
       const data = await res.json();
       document.getElementById("temp").innerText = data.temperature;
       document.getElementById("hum").innerText = data.humidity;
-      document.getElementById("time").innerText = data.timestamp;
+      document.getElementById("timestamp").innerText = data.timestamp;
     }
-    setInterval(updateData, 5000);
+
+    async function loadChartData() {
+      const res = await fetch("/api/history?limit=50");
+      const data = await res.json();
+
+      const labels = data.map(d => new Date(d.timestamp).toLocaleTimeString());
+      const temps = data.map(d => d.temperature);
+      const hums = data.map(d => d.humidity);
+
+      const ctx = document.getElementById('historyChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Temperature (°C)',
+              data: temps,
+              borderColor: 'red',
+              fill: false
+            },
+            {
+              label: 'Humidity (%)',
+              data: hums,
+              borderColor: 'blue',
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          }
+        }
+      });
+    }
+
     updateData();
+    setInterval(updateData, 5000); // Refresh values every 5s
+    loadChartData(); // Load graph once on page load
   </script>
 </body>
 </html>

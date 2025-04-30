@@ -40,6 +40,23 @@ def latest_data():
         return jsonify({"temperature": row[0], "humidity": row[1], "timestamp": row[2]})
     return jsonify({"error": "No data"}), 404
 
+@app.route("/api/history", methods=["GET"])
+def history():
+    limit = int(request.args.get("limit", 50))  # default 50 records
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT temperature, humidity, timestamp FROM readings ORDER BY id DESC LIMIT ?", 
+            (limit,)
+        ).fetchall()
+        # Reverse to show oldest → newest
+        rows.reverse()
+        data = [
+            {"temperature": t, "humidity": h, "timestamp": ts}
+            for (t, h, ts) in rows
+        ]
+    return jsonify(data)
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
