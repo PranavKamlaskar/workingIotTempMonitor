@@ -2,12 +2,12 @@
 #include <ESP8266HTTPClient.h>
 #include <DHT.h>
 
-#define WIFI_SSID "your_wifi"   				//wifi
-#define WIFI_PASSWORD "your_wifi_password"			//pass
+#define WIFI_SSID "hotspot"
+#define WIFI_PASSWORD "qwertyuiop"
 #define DHTPIN D4
 #define DHTTYPE DHT11
 
-const char* server = "http://your-ec2-ip:5000/api/data";	//ip
+const char* server = "http://3.90.162.16:5000/api/data";
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -28,8 +28,10 @@ void loop() {
     float hum = dht.readHumidity();
 
     if (!isnan(temp) && !isnan(hum)) {
+      WiFiClient client;
       HTTPClient http;
-      http.begin(server);
+
+      http.begin(client, server);
       http.addHeader("Content-Type", "application/json");
 
       String payload = "{\"temperature\":" + String(temp) + ",\"humidity\":" + String(hum) + "}";
@@ -41,4 +43,3 @@ void loop() {
 
   delay(60000); // Wait 60 seconds
 }
-
