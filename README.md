@@ -156,3 +156,23 @@ def latest_data():
   }
   setInterval(updateData, 5000);  // Every 5 seconds
 </script>
+
+
+Let's add a real-time historical graph using:
+
+✅ A new Flask endpoint: /api/history
+✅ Chart.js to plot the latest temperature & humidity readings on the dashboard
+
+Step 1: Add /api/history Endpoint to Flask (Backend)
+📍In your app.py, add this route:                 <!--refer the file version 2-->
+
+Step 2: Update HTML Template (Frontend)
+📍In templates/index.html:
+🔹 Add a <canvas> tag for the chart:
+Insert this below your sensor values display:
+
+Include Chart.js in the <head>:
+
+Add JS code to fetch history and draw the chart:
+Put this below your updateData() function in <script>:            <!--refer the index.html version2-->
+
