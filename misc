@@ -1,0 +1,44 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <DHT.h>
+
+#define WIFI_SSID "your_wifi"   				//wifi
+#define WIFI_PASSWORD "your_wifi_password"			//pass
+#define DHTPIN D4
+#define DHTTYPE DHT11
+
+const char* server = "http://your-ec2-ip:5000/api/data";	//ip
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  dht.begin();
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    float temp = dht.readTemperature();
+    float hum = dht.readHumidity();
+
+    if (!isnan(temp) && !isnan(hum)) {
+      HTTPClient http;
+      http.begin(server);
+      http.addHeader("Content-Type", "application/json");
+
+      String payload = "{\"temperature\":" + String(temp) + ",\"humidity\":" + String(hum) + "}";
+      int httpCode = http.POST(payload);
+      Serial.println(httpCode);
+      http.end();
+    }
+  }
+
+  delay(60000); // Wait 60 seconds
+}
+
