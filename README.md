@@ -176,3 +176,37 @@ Include Chart.js in the <head>:
 Add JS code to fetch history and draw the chart:
 Put this below your updateData() function in <script>:            <!--refer the index.html version2-->
 
+
+###Telegram Alert Setup
+
+ Step 1: Create a Telegram Bot
+In Telegram, search for @BotFather
+
+Start chat and type: /newbot
+
+Choose a name and username (e.g., TempAlertBot)
+
+You'll get a Bot Token like:
+
+123456789:AAHh-sdf98asf7asF...etc
+📌 Save this token
+
+🔧 Step 2: Get Your chat_id
+Send a message to your bot (e.g., "hi")
+
+Open this URL in browser:
+https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+Look for "chat":{"id":...} — copy that chat_id
+
+Email Alert Setup (Gmail)
+
+🔧 Step 1: Get App Password (Gmail only)
+Enable 2-step verification on your Google account
+
+Visit: https://myaccount.google.com/apppasswords
+
+Generate app password for “Mail”
+Example: xkqj wpgs xxyz abcd                                        <!--refer youtube video-->
+
+Update app.py for telegram and gmail                                <!--refer the versions/phase3-->
+

@@ -1,54 +1,97 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 from datetime import datetime
-import os
+import requests
+import smtplib
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
-
 DB_PATH = "sensor.db"
 
-def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS readings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                temperature REAL,
-                humidity REAL,
-                timestamp TEXT
-            )
-        ''')
-init_db()
+# === CONFIGURATION ===
+
+# Telegram
+TELEGRAM_BOT_TOKEN = '7994386788:AAEfYyKCdkCOn6W21ksQK9hRqdFnXsMJu2s'
+TELEGRAM_CHAT_ID = '727640208'
+
+# Email (Gmail)
+EMAIL_ADDRESS = "pranav.21.kamlaskar@gmail.com"
+EMAIL_PASSWORD = "yofl wvuh asln xnpx"
+EMAIL_RECEIVER = "pranav.21.kamlaskar@gmail.com"
+
+# === HELPER FUNCTIONS ===
+
+def send_telegram_alert(message):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
+    requests.post(url, json=payload)
+
+def send_email_alert(subject, body):
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = EMAIL_ADDRESS
+    msg["To"] = EMAIL_RECEIVER
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        smtp.send_message(msg)
+
+# === ROUTES ===
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route("/api/data", methods=["POST"])
 def receive_data():
     data = request.get_json()
-    if not data or "temperature" not in data or "humidity" not in data:
-        return jsonify({"error": "Invalid payload"}), 400
+    temperature = data.get("temperature")
+    humidity = data.get("humidity")
+    timestamp = datetime.utcnow().isoformat()
 
     with sqlite3.connect(DB_PATH) as conn:
-        conn.execute(
-            "INSERT INTO readings (temperature, humidity, timestamp) VALUES (?, ?, ?)",
-            (data["temperature"], data["humidity"], datetime.now().isoformat())
-        )
-    return jsonify({"status": "success"}), 201
+        conn.execute("INSERT INTO readings (temperature, humidity, timestamp) VALUES (?, ?, ?)", 
+                     (temperature, humidity, timestamp))
+        conn.commit()
+
+    # === ALERT CONDITIONS ===
+    if temperature > 30 or humidity < 25:
+        alert_msg = f"⚠️ Alert!\nTemp: {temperature}°C\nHumidity: {humidity}%"
+
+        # Send Telegram alert
+        send_telegram_alert(alert_msg)
+
+        # Send Email alert
+        subject = "Sensor Alert!"
+        body = f"Temperature: {temperature}°C\nHumidity: {humidity}%"
+        send_email_alert(subject, body)
+
+    return jsonify({"status": "success"}), 200
 
 @app.route("/api/latest", methods=["GET"])
-def latest_data():
+def latest():
     with sqlite3.connect(DB_PATH) as conn:
-        row = conn.execute("SELECT temperature, humidity, timestamp FROM readings ORDER BY id DESC LIMIT 1").fetchone()
-    if row:
-        return jsonify({"temperature": row[0], "humidity": row[1], "timestamp": row[2]})
-    return jsonify({"error": "No data"}), 404
+        row = conn.execute(
+            "SELECT temperature, humidity, timestamp FROM readings ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        if row:
+            temp, hum, ts = row
+            return jsonify({
+                "temperature": temp,
+                "humidity": hum,
+                "timestamp": ts
+            })
+        else:
+            return jsonify({"error": "No data"}), 404
 
 @app.route("/api/history", methods=["GET"])
 def history():
-    limit = int(request.args.get("limit", 50))  # default 50 records
+    limit = int(request.args.get("limit", 50))
     with sqlite3.connect(DB_PATH) as conn:
         rows = conn.execute(
             "SELECT temperature, humidity, timestamp FROM readings ORDER BY id DESC LIMIT ?", 
             (limit,)
         ).fetchall()
-        # Reverse to show oldest → newest
         rows.reverse()
         data = [
             {"temperature": t, "humidity": h, "timestamp": ts}
@@ -56,10 +99,7 @@ def history():
         ]
     return jsonify(data)
 
-
-@app.route("/")
-def index():
-    return render_template("index.html")
+# === MAIN ===
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
