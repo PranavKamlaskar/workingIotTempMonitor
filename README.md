@@ -210,3 +210,58 @@ Example: xkqj wpgs xxyz abcd                                        <!--refer yo
 
 Update app.py for telegram and gmail                                <!--refer the versions/phase3-->
 
+
+
+🔐 API Key Authentication (Header-Based)
+🎯 Goal:
+Only requests from devices that include a valid API key in the header will be accepted by your Flask server.
+
+✅ Step 1: Define an API Key in Flask
+In app.py, near the top (after your imports), add:
+
+API_KEY = "your_super_secret_key"
+Pick a strong random string — even abc123 is okay for testing, but in production use a longer key.
+
+✅ Step 2: Update the /api/data route to check the key
+Find your /api/data route and update it like this:
+
+@app.route('/api/data', methods=['POST'])
+def receive_data():
+    # 🔐 Check for valid API key
+    api_key = request.headers.get('X-API-KEY')
+    if api_key != API_KEY:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # ✅ Continue with normal data handling
+    data = request.get_json()
+    temperature = data.get('temperature')
+    humidity = data.get('humidity')
+    timestamp = datetime.now()
+
+    # ... store in DB, trigger alerts, etc ...
+✅ Step 3: Update ESP8266 Code to Send API Key
+In your Arduino sketch (.ino file), update the http.begin() and headers:
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+// inside loop() or sendData() function:
+HTTPClient http;
+WiFiClient client;
+
+http.begin(client, server); // Pass WiFiClient object
+http.addHeader("Content-Type", "application/json");
+http.addHeader("X-API-KEY", "your_super_secret_key");  // 🔐 Add this
+
+int httpResponseCode = http.POST(jsonString);
+Make sure "your_super_secret_key" matches the one in app.py.
+
+✅ Step 4: Restart Flask Server
+After editing app.py, restart your server:
+
+python3 app.py
+Test it from ESP — if the API key is correct, data flows. If wrong or missing, server responds:
+
+{"error": "Unauthorized"}
+🔐 You're Now Protected
+This simple check ensures only authorized devices can POST data to your backend.
