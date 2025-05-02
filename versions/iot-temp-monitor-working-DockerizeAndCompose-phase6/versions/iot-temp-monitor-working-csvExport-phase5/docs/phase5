@@ -1,0 +1,31 @@
+✅ Step-by-Step: Add /export CSV Download Route to Your Flask App
+🔧 Step 1: Add a New Route to app.py
+Open your app.py and below your other routes, add this:
+
+import csv
+from flask import Response
+Then add the new route:
+
+@app.route("/export", methods=["GET"])
+def export_csv():
+    def generate():
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.execute("SELECT temperature, humidity, timestamp FROM readings ORDER BY id DESC")
+            yield "temperature,humidity,timestamp\n"  # CSV header
+            for row in cursor:
+                yield f"{row[0]},{row[1]},{row[2]}\n"
+
+    return Response(generate(), mimetype="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=sensor_data.csv"})
+🧪 Step 2: Restart Flask Server
+python3 app.py
+🌐 Step 3: Test in Browser
+Go to:
+
+http://<your-ec2-ip>:5000/export
+It should download a file named sensor_data.csv with all your readings like:
+
+temperature,humidity,timestamp
+36.1,20.0,2025-04-30T16:59:10.123456
+35.9,19.5,2025-04-30T16:58:10.987654
+...
