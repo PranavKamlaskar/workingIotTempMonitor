@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IoT Dashboard</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+  </style>
+</head>
+<body>
+  <h1>Temperature & Humidity</h1>
+  <p><strong>Temperature:</strong> <span id="temp">--</span> °C</p>
+  <p><strong>Humidity:</strong> <span id="hum">--</span> %</p>
+  <p><strong>Time:</strong> <span id="time">--</span></p>
+
+  <script>
+    async function updateData() {
+      const res = await fetch("/api/latest");
+      const data = await res.json();
+      document.getElementById("temp").innerText = data.temperature;
+      document.getElementById("hum").innerText = data.humidity;
+      document.getElementById("time").innerText = data.timestamp;
+    }
+    setInterval(updateData, 5000);
+    updateData();
+  </script>
+</body>
+</html>
+
