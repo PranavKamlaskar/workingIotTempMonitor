@@ -1,0 +1,64 @@
+📝 Project Summary: IoT Temperature & Humidity Monitor
+🔧 Hardware
+ESP8266 + DHT11 Sensor
+
+Reads temperature and humidity every 60 seconds
+
+Sends data to your Flask API over HTTP using JSON
+
+🌐 Backend (Hosted on EC2)
+Flask API with SQLite
+
+/api/data: Accepts sensor data via POST
+
+/api/latest: Returns the most recent reading
+
+/api/history: Returns the last N readings (used in the graph)
+
+Database
+
+SQLite stores each reading with timestamp, temperature, and humidity
+
+API Key Authentication
+
+X-API-KEY header added to secure /api/data route
+
+Unauthorized requests are rejected with 401
+
+📊 Frontend Dashboard
+HTML page with:
+
+Live temperature & humidity readings
+
+Real-time chart (Chart.js) showing historical data (last 50 entries)
+
+🚨 Alerting
+Telegram Bot Integration
+
+Sends alert if temperature > 30°C or humidity < 25%
+
+Email Alerts
+
+Sends an email with current values when the same conditions are met
+
+🔐 Secret Management
+.env file used for:
+
+Telegram token, email credentials, API key, etc.
+
+Used python-dotenv to load secrets into Flask app
+
+.env added to .gitignore to prevent accidental leaks
+
+✅ Completed Features: 6 / 9
+ESP8266 sensor integration
+
+Flask API on EC2
+
+SQLite storage
+
+Real-time dashboard
+
+Alerting via Telegram & Email
+
+API key protection

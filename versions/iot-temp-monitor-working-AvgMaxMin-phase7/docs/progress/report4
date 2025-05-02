@@ -1,0 +1,23 @@
+📝 IoT Temperature & Humidity Monitor – Progress Report
+🎯 Core Functionality
+Feature	Status	Description
+✅ ESP8266 + DHT11	✔️ Done	Reads temperature & humidity, sends to server every 60s
+✅ Flask API on EC2	✔️ Done	Receives sensor data and provides endpoints
+✅ SQLite Integration	✔️ Done	Stores all sensor readings with timestamps
+✅ Dashboard	✔️ Done	Real-time values and graph via Chart.js
+
+📢 Alerting
+Feature	Status	Description
+✅ Telegram Alerts	✔️ Done	Sends message when temp > 30°C or humidity < 25%
+✅ Email Alerts	✔️ Done	Sends email with same alert conditions
+
+🔐 Security & Secrets
+Feature	Status	Description
+✅ .env File for Secrets	✔️ Done	All sensitive info (tokens, passwords, keys) moved to .env
+✅ API Key Authentication	✔️ Done	/api/data requires X-API-KEY header to accept data
+
+📤 Data Access
+Feature	Status	Description
+✅ Latest Data API	✔️ Done	/api/latest shows most recent reading
+✅ Historical Data API	✔️ Done	/api/history returns last 50 readings for graph
+✅ CSV Export	✔️ Newly Done	/export generates and downloads .csv of all sensor data

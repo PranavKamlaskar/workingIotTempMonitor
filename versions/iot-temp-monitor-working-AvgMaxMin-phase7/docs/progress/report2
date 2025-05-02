@@ -1,0 +1,55 @@
+📋 IoT DevOps Project Progress Report (ESP8266 + Flask + EC2)
+✅ 1. Real-Time IoT Sensor Monitoring (ESP8266 + DHT11)
+Hardware: ESP8266 reads temperature and humidity via DHT11 sensor.
+
+Frequency: Sends readings every 60 seconds.
+
+Protocol: HTTP POST with JSON payload to your EC2-hosted Flask API.
+
+✅ 2. Backend API Server (Flask on EC2)
+Hosted on: AWS EC2 Linux instance.
+
+Endpoints:
+
+POST /api/data: Receives and stores sensor data.
+
+GET /api/latest: Returns the latest reading.
+
+GET /api/history: Returns the last 50 readings (for graph).
+
+Database: SQLite stores timestamped readings (temperature, humidity, timestamp).
+
+✅ 3. Live HTML Dashboard
+Shows real-time sensor values (updates every 5 seconds).
+
+Built using HTML + JS + AJAX (no frameworks).
+
+Auto-refreshes values from /api/latest.
+
+✅ 4. Historical Graph Visualization
+Displays a line chart of last 50 readings using Chart.js.
+
+Fetches data from /api/history.
+
+Graph updates on page load (manual refresh to update).
+
+✅ 5. Alerting System (Automated Notifications)
+🔔 Telegram Alerts
+Configured a Telegram bot using BotFather.
+
+ESP-triggered alerts (e.g., temp > 35°C or humidity < 25%) send instant messages via Telegram Bot API.
+
+📧 Email Alerts
+Integrated SMTP email notifications using Gmail App Passwords.
+
+Same alert conditions also send formatted email to your inbox.
+
+🧰 Tech Stack Summary
+Layer	Technology
+Microcontroller	ESP8266 + DHT11
+Language	Arduino (ESP) + Python
+Server	Flask API (Python)
+Hosting	AWS EC2 (Linux, Ubuntu)
+Database	SQLite
+Frontend	HTML + JS + Chart.js
+Notifications	Telegram Bot + Email (SMTP)

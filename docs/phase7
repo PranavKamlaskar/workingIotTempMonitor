@@ -1,0 +1,184 @@
+Awesome! Let’s enhance your dashboard by:
+
+📊 Displaying Analytics Summary (avg, min, max for temp & humidity) above the graph
+
+🕒 Adding buttons for "All", "Last 24h", "Last 7 days" to filter the graph and stats
+
+✅ Step-by-Step: Frontend Enhancements for Summary & Filters
+🔧 1. Update Your Flask /api/summary Route for Filtering
+Replace your existing /api/summary route with this:
+
+python
+Copy
+Edit
+from datetime import datetime, timedelta
+
+@app.route("/api/summary", methods=["GET"])
+def summary():
+    range_param = request.args.get("range", "all")
+    
+    query = """
+        SELECT 
+            AVG(temperature), MIN(temperature), MAX(temperature),
+            AVG(humidity), MIN(humidity), MAX(humidity)
+        FROM readings
+    """
+    params = ()
+
+    if range_param == "24h":
+        since = datetime.utcnow() - timedelta(days=1)
+        query += " WHERE timestamp >= ?"
+        params = (since.isoformat(),)
+    elif range_param == "7d":
+        since = datetime.utcnow() - timedelta(days=7)
+        query += " WHERE timestamp >= ?"
+        params = (since.isoformat(),)
+
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute(query, params).fetchone()
+
+    if row:
+        avg_temp, min_temp, max_temp, avg_hum, min_hum, max_hum = row
+        return jsonify({
+            "temperature": {
+                "avg": round(avg_temp, 2),
+                "min": min_temp,
+                "max": max_temp
+            },
+            "humidity": {
+                "avg": round(avg_hum, 2),
+                "min": min_hum,
+                "max": max_hum
+            }
+        })
+    else:
+        return jsonify({"error": "No data available"}), 404
+🖼️ 2. Update index.html
+Replace your HTML <body> with this structure (or integrate into yours):
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP8266 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    .reading {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .summary {
+      margin-top: 30px;
+    }
+    #myChart {
+      max-width: 800px;
+      margin-top: 40px;
+    }
+    .range-buttons button {
+      margin-right: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Temperature & Humidity</h1>
+
+  <!-- Live Readings -->
+  <div class="reading">Temperature: <span id="temp">--</span> °C</div>
+  <div class="reading">Humidity: <span id="hum">--</span> %</div>
+  <div class="reading">Time: <span id="timestamp">--</span></div>
+
+  <!-- Summary Section -->
+  <div class="summary">
+    <h2>Summary (Filtered)</h2>
+    <p><strong>Temperature:</strong> Avg: <span id="temp-avg">--</span>°C, Min: <span id="temp-min">--</span>°C, Max: <span id="temp-max">--</span>°C</p>
+    <p><strong>Humidity:</strong> Avg: <span id="hum-avg">--</span>%, Min: <span id="hum-min">--</span>%, Max: <span id="hum-max">--</span>%</p>
+  </div>
+
+  <!-- Range Buttons -->
+  <div class="range-buttons">
+    <button onclick="loadData('all')">All</button>
+    <button onclick="loadData('24h')">Last 24h</button>
+    <button onclick="loadData('7d')">Last 7 days</button>
+  </div>
+
+  <!-- Chart -->
+  <canvas id="myChart" width="800" height="400"></canvas>
+
+  <script>
+    let chart;
+
+    async function updateLive() {
+      const res = await fetch("/api/latest");
+      const data = await res.json();
+      document.getElementById("temp").innerText = data.temperature;
+      document.getElementById("hum").innerText = data.humidity;
+      document.getElementById("timestamp").innerText = data.timestamp;
+    }
+
+    async function loadSummary(range) {
+      const res = await fetch(`/api/summary?range=${range}`);
+      const data = await res.json();
+      document.getElementById('temp-avg').textContent = data.temperature.avg;
+      document.getElementById('temp-min').textContent = data.temperature.min;
+      document.getElementById('temp-max').textContent = data.temperature.max;
+      document.getElementById('hum-avg').textContent = data.humidity.avg;
+      document.getElementById('hum-min').textContent = data.humidity.min;
+      document.getElementById('hum-max').textContent = data.humidity.max;
+    }
+
+    async function loadHistory(range) {
+      const res = await fetch(`/api/history?limit=50`); // Optional: support range later
+      const data = await res.json();
+
+      const labels = data.map(d => new Date(d.timestamp).toLocaleTimeString());
+      const tempData = data.map(d => d.temperature);
+      const humData = data.map(d => d.humidity);
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(document.getElementById("myChart"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Temperature (°C)",
+              data: tempData,
+              borderColor: "red",
+              fill: false
+            },
+            {
+              label: "Humidity (%)",
+              data: humData,
+              borderColor: "blue",
+              fill: false
+            }
+          ]
+        }
+      });
+    }
+
+    async function loadData(range) {
+      await loadSummary(range);
+      await loadHistory(range);
+    }
+
+    updateLive();
+    setInterval(updateLive, 5000);
+    loadData("all");
+  </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,188 @@
+🔐 API Key Authentication (Header-Based)
+🎯 Goal:
+Only requests from devices that include a valid API key in the header will be accepted by your Flask server.
+
+✅ Step 1: Define an API Key in Flask
+In app.py, near the top (after your imports), add:
+
+API_KEY = "your_super_secret_key"
+Pick a strong random string — even abc123 is okay for testing, but in production use a longer key.
+
+✅ Step 2: Update the /api/data route to check the key
+Find your /api/data route and update it like this:
+
+@app.route('/api/data', methods=['POST'])
+def receive_data():
+    # 🔐 Check for valid API key
+    api_key = request.headers.get('X-API-KEY')
+    if api_key != API_KEY:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # ✅ Continue with normal data handling
+    data = request.get_json()
+    temperature = data.get('temperature')
+    humidity = data.get('humidity')
+    timestamp = datetime.now()
+
+    # ... store in DB, trigger alerts, etc ...
+✅ Step 3: Update ESP8266 Code to Send API Key
+In your Arduino sketch (.ino file), update the http.begin() and headers:
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+// inside loop() or sendData() function:
+HTTPClient http;
+WiFiClient client;
+
+http.begin(client, server); // Pass WiFiClient object
+http.addHeader("Content-Type", "application/json");
+http.addHeader("X-API-KEY", "your_super_secret_key");  // 🔐 Add this
+
+int httpResponseCode = http.POST(jsonString);
+Make sure "your_super_secret_key" matches the one in app.py.
+
+✅ Step 4: Restart Flask Server
+After editing app.py, restart your server:
+
+python3 app.py
+Test it from ESP — if the API key is correct, data flows. If wrong or missing, server responds:
+
+{"error": "Unauthorized"}
+🔐 You're Now Protected
+This simple check ensures only authorized devices can POST data to your backend.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+🛑 Immediate Actions You Should Take
+✅ 1. Revoke the Leaked Telegram Bot Token
+Go to @BotFather and:
+
+Use /revoke on the affected bot
+
+Or delete the bot and recreate it
+
+This will invalidate the old token immediately
+
+✅ 2. Remove the Token from Git History (Important)
+Run the following to clean it from all commits:
+
+bash
+Copy
+Edit
+# Make sure you are in the repo directory
+pip install git-filter-repo
+
+# Replace TOKEN_VALUE with the actual string or part of it
+git filter-repo --replace-text <(echo 'TOKEN_VALUE==REMOVED')
+Then force-push:
+
+bash
+Copy
+Edit
+git push origin --force --all
+Or if using GitHub CLI:
+
+bash
+Copy
+Edit
+gh secret remove TELEGRAM_BOT_TOKEN
+Warning: This rewrites commit history — coordinate with collaborators first if it’s a shared repo.
+
+✅ 3. Move Secrets to Environment Variables
+Update app.py:
+
+python
+Copy
+Edit
+import os
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+Then in your terminal or .env file (for local testing):
+
+bash
+Copy
+Edit
+export TELEGRAM_BOT_TOKEN="your-new-token"
+🔐 Summary
+Action	Status
+Revoke old token	✅ Required now
+Remove from git history	✅ Strongly recommended
+Use env variables	✅ Best practice
+Avoid committing secrets	✅ Use .gitignore and .env
+
+
+
+
+
+✅ Step-by-Step: Using .env for Secrets
+📁 Step 1: Create a .env file in your project root
+Inside your project folder (same directory as app.py), create a file named:
+
+bash
+Copy
+Edit
+.env
+Then add your secrets like this:
+
+env
+Copy
+Edit
+TELEGRAM_BOT_TOKEN=your_new_telegram_token
+TELEGRAM_CHAT_ID=123456789
+EMAIL_ADDRESS=your_email@gmail.com
+EMAIL_PASSWORD=your_gmail_app_password
+EMAIL_RECEIVER=receiver_email@example.com
+API_KEY=your_super_secret_api_key
+⚠️ Do not wrap values in quotes, and don’t add spaces around =.
+
+📦 Step 2: Install python-dotenv
+This allows Flask to load variables from .env.
+
+bash
+Copy
+Edit
+pip install python-dotenv
+🧠 Step 3: Load .env in your Flask app
+At the top of your app.py, add:
+
+python
+Copy
+Edit
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # 🔁 Loads from .env automatically
+
+# Use secrets from .env
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER")
+API_KEY = os.getenv("API_KEY")
+🛑 Step 4: Add .env to .gitignore
+To avoid leaking secrets again, add this line to your .gitignore:
+
+bash
+Copy
+Edit
+.env
+Now .env will be ignored by Git forever.
+
+✅ You’re Done!
+This is the secure and professional way to manage sensitive keys.

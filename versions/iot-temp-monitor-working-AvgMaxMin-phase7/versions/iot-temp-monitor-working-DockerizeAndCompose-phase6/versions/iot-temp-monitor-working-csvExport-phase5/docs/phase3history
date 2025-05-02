@@ -1,0 +1,209 @@
+    1  sudo apt update && sudo apt upgrade -y
+    2  sudo apt install python3 python3-pip git -y
+    3  mkdir iot-temp-monitor && cd iot-temp-monitor
+    4  vim requirements.txt
+    5  pip3 install -r requirements.txt
+    6  sudo apt install python3-venv -y
+    7  python3 -m venv venv 
+    8  source venv/bin/activate
+    9  pip install -r requirements.txt
+   10  vim app.py
+   11  vim -r templates/index.html
+   12  :q
+   13  mkdir templates
+   14  touch templates/index.html
+   15  vim templates/index.html 
+   16  python3 app.py
+   17  sudo apt install screen -y
+   18  screen -S flask
+   19  history
+   20  ls
+   21  cd iot-temp-monitor/
+   22  ls
+   23  ls -a 
+   24  vim .gitignore 
+   25  git add .
+   26  git commit -m "Initial IoT Temperature & Humidity Monitor project"
+   27  git remote add origin https://github.com/PranavKamlaskar/workingIotTempMonitor.git
+   28  git branch -M main
+   29  git push -u origin main
+   30  vim misc
+   31  ls
+   32  git add misc
+   33  git commit -r "misc esp code"
+   34  git commit -m "misc esp code"
+   35  git push -u origin main 
+   36  ls
+   37  vim misc 
+   38  git add misc
+   39  git commit -m "misc esp code"
+   40  git push -u origin main 
+   41  ls
+   42  cd 
+   43  ls
+   44  mkdir backup
+   45  cd backup/
+   46  cp ~/iot-temp-monitor .
+   47  cp -r ~/iot-temp-monitor .
+   48  ls
+   49  mv iot-temp-monitor iot-temp-monitor-working-phase1 
+   50  ls
+   51  cd ..
+   52  ls
+   53  cd iot-temp-monitor/
+   54  ls
+   55  mkdir docs
+   56  cd docs
+   57  ls
+   58  vim phase1
+   59  cd ..
+   60  ls
+   61  vim app.py 
+   62  vim templates/index.html 
+   63  python3 app.py
+   64  ls
+   65  source venv/bin/activate
+   66  python3 app.py
+   67  vim templates/index.html 
+   68  python3 app.py
+   69  ls
+   70  cd ..
+   71  cp iot-temp-monitor/ backup/.
+   72  cp -r iot-temp-monitor/ backup/.
+   73  mv backup/iot-temp-monitor iot-temp-monitor-phase2
+   74  ls
+   75  ls backup/
+   76  mv iot-temp-monitor-phase2/ backup/iot-temp-monitor-working-phase2
+   77  ls backup/
+   78  ls
+   79  cd iot-temp-monitor/
+   80  ls
+   81  mkdir versions
+   82  cp ~/backup/iot-temp-monitor-working-phase1 versions/.
+   83  cp -r ~/backup/iot-temp-monitor-working-phase1 versions/.
+   84  ls
+   85  cp -r ~/backup/iot-temp-monitor-working-phase2 versions/.
+   86  ls
+   87  git add . 
+   88  git commit -m "making versions"
+   89  git push -u origin main
+   90  git fetch
+   91  git push -u origin main
+   92  git pull origin main
+   93  git pull origin main --no-rebase
+   94  git add .
+   95  git commit -m "Merge remote changes"
+   96  git push origin main
+   97  ls
+   98  vim README.md 
+   99  ls
+  100  python3 app.py 
+  101  ls
+  102  vim sensor.db 
+  103  git init
+  104  vim .gitignore
+  105  history
+  106  ls
+  107  cd iot-temp-monitor/
+  108  ls
+  109  cd docs
+  110  ls
+  111  vim phase2
+  112  ls
+  113  mkdir progress
+  114  cd progress/
+  115  ls
+  116  vim report1
+  117  ls
+  118  cd ..
+  119  ls
+  120  vim app.py
+  121  vim app.py 
+  122  python3 app.py 
+  123  source venv/bin/activate
+  124  python3 app.py 
+  125  pip install requests
+  126  python3 app.py 
+  127  ls
+  128  cp app.py versions/iot-temp-monitor-working-phase3
+  129  ls
+  130  ls versions/
+  131  rm versions/iot-temp-monitor-working-phase3
+  132  ls versions/
+  133  cd ..
+  134  deactivate
+  135  ls
+  136  ls backup/
+  137  cp -r iot-temp-monitor/ backup/iot-temp-monitor-working-gmailandtelegramalerts-phase3
+  138  ls
+  139  ls backup/
+  140  cp -r backup/iot-temp-monitor-working-gmailandtelegramalerts-phase3/ iot-temp-monitor/versions/.
+  141  cd iot-temp-monitor/
+  142  ls
+  143  cd versions/
+  144  ls
+  145  cd ..
+  146  ls
+  147  vim README.md 
+  148  ls
+  149  cd dock
+  150  ls docs/
+  151  ls
+  152  vim docs/progress/report2
+  153  ls
+  154  git add .
+  155  git commit -m "telegram and gmail alerts"
+  156  ls
+  157  git push -u origin main
+  158  ls
+  159  ls versions
+  160  ls versions/iot-temp-monitor-working-gmailandtelegramalerts-phase3/
+  161  cd versions/
+  162  ls
+  163  ls iot-temp-monitor-working-1
+  164  ls iot-temp-monitor-working-phase1
+  165  ls -a iot-temp-monitor-working-phase1
+  166  ls
+  167  cd iot-temp-monitor-working-gmailandtelegramalerts-phase3/
+  168  ls -a
+  169  rm -rf .git
+  170  rm -rf .gitignore 
+  171  ls
+  172  cd ..
+  173  ls
+  174  cd iot-temp-monitor-working-phase1
+  175  ls
+  176  ls -a 
+  177  rm -rf .git
+  178  rm -rf .gitignore 
+  179  ls
+  180  cd ..
+  181  ls
+  182  cd iot-temp-monitor-working-phase2
+  183  ls
+  184  ls -a 
+  185  rm -rf .git
+  186  rm -rf .gitignore 
+  187  ls
+  188  cd ..
+  189  ls
+  190  git add ..
+  191  ls
+  192  ls -a 
+  193  git add .
+  194  git commit -m "removed .git and .gitignore from versions folders "
+  195  git push -u origin main
+  196  git rm --cached versions/
+  197  git rm -r --cached versions/
+  198  git add .
+  199  git commit -m "removed .git and .gitignore from versions folder 2 "
+  200  git push -u origin main 
+  201  history
+  202  ls
+  203  cd ..
+  204  ls
+  205  mkdir history 
+  206  cd history/
+  207  ls
+  208  vim phase3history
+  209  history > phase3history

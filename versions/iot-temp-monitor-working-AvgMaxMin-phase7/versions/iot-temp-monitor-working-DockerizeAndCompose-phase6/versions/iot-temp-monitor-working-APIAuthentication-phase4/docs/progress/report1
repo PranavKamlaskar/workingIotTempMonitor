@@ -1,0 +1,60 @@
+📊 IoT Temperature & Humidity Monitoring System — Progress Report
+✅ 1. Hardware Setup
+Device: ESP8266 microcontroller + DHT11 sensor
+
+Function: Reads temperature & humidity every 60 seconds
+
+Code: Arduino sketch that:
+
+Connects to Wi-Fi
+
+Reads sensor values
+
+Sends data as JSON via HTTP POST
+
+✅ 2. Cloud Backend on EC2 (Flask + SQLite)
+Flask API running on EC2 instance
+
+Endpoints:
+
+POST /api/data: Receives JSON data from ESP8266
+
+GET /api/latest: Returns the latest sensor reading
+
+GET /api/history: Returns last N readings for charting
+
+Data stored in: SQLite database (sensor.db)
+
+Table: readings(id, temperature, humidity, timestamp)
+
+✅ 3. Web Dashboard (HTML + JavaScript)
+Hosted on the same EC2 server via Flask
+
+Displays:
+
+Live Temperature, Humidity, and Timestamp (updates every 5s)
+
+A line graph using Chart.js showing last 50 readings
+
+✅ Tech Stack Overview
+Layer	Technology
+Microcontroller	ESP8266 + DHT11
+Transport	HTTP POST (JSON)
+Backend	Python + Flask + SQLite
+Frontend	HTML + JS + Chart.js
+Hosting	AWS EC2 (Linux)
+
+🧠 Skills Practiced So Far
+IoT sensor programming (ESP8266, DHT11)
+
+HTTP communication and REST APIs
+
+Python Flask development
+
+SQL database integration
+
+Real-time front-end updates with JavaScript
+
+Basic data visualization with Chart.js
+
+Linux server setup and service hosting on EC2

@@ -1,0 +1,32 @@
+Awesome work so far! Here's your updated Project Report reflecting everything we've completed up to Docker + Nginx deployment.
+
+📝 IoT Temperature & Humidity Monitor – Project Report
+🎯 Core System
+Feature	Status	Description
+✅ Sensor Hardware (ESP8266 + DHT11)	✔️ Done	Reads temperature and humidity, sends data every 60s
+✅ Flask API on EC2	✔️ Done	Receives and processes incoming data
+✅ SQLite DB	✔️ Done	Stores all sensor readings
+✅ Chart.js Dashboard	✔️ Done	Displays live and historical data graphically
+
+📢 Alerting System
+Feature	Status	Description
+✅ Telegram Alerts	✔️ Done	Sends message when temperature > 30°C or humidity < 25%
+✅ Email Alerts	✔️ Done	Same conditions trigger email to receiver
+
+🔐 Security & Auth
+Feature	Status	Description
+✅ .env File for Secrets	✔️ Done	Tokens, passwords, and keys stored securely
+✅ API Key Authentication	✔️ Done	X-API-KEY required for sensor to POST data to /api/data
+
+📤 Data Access & Tools
+Feature	Status	Description
+✅ Latest Data Endpoint	✔️ Done	/api/latest returns the newest reading
+✅ History Endpoint	✔️ Done	/api/history returns last 50 readings
+✅ CSV Export	✔️ Done	/export downloads full reading history as a .csv
+
+🐳 Deployment Infrastructure
+Feature	Status	Description
+✅ Dockerfile	✔️ Done	Flask app containerized using Python slim image
+✅ Docker Compose	✔️ Done	Manages Flask + Nginx services easily
+✅ Nginx Reverse Proxy	✔️ Done	Nginx routes external requests to Flask, listens on port 80
+
